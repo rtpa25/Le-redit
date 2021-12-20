@@ -38,6 +38,7 @@ export const Query = {
         id: Number(id),
       },
     });
+
     return post;
   },
 };

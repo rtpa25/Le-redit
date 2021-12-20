@@ -19,4 +19,10 @@ export const typeDefs = gql`
     createdAt: String!
     updatedAt: String!
   }
+  type User {
+    id: ID!
+    createdAt: String!
+    updatedAt: String!
+    username: String!
+  }
 `;
