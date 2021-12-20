@@ -1,0 +1,31 @@
+{
+  "name": "leredit",
+  "version": "1.0.0",
+  "description": "This is a redit clone and a practice project",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "start": "node build/index.js",
+    "postinstall": "tsc"
+  },
+  "keywords": [],
+  "author": "Ronit Panda",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/cors": "^2.8.12",
+    "@types/node": "^17.0.1",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "@prisma/client": "^3.6.0",
+    "apollo-server": "^3.5.0",
+    "cors": "^2.8.5",
+    "dayjs": "^1.10.7",
+    "graphql": "^15.8.0",
+    "pino": "^7.5.1",
+    "pino-pretty": "^7.3.0",
+    "prisma": "^3.6.0",
+    "dotenv": "^8.2.0"
+  }
+}
