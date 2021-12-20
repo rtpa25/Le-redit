@@ -4,7 +4,7 @@ import { ApolloServer } from 'apollo-server';
 import { PrismaClient } from '@prisma/client';
 import logger from './utils/logger';
 import { typeDefs } from './schema';
-import { Query } from './resolvers/query';
+import { Mutation, Query } from './resolvers/z(exporter)';
 
 const prisma = new PrismaClient();
 
@@ -13,6 +13,7 @@ const main = async () => {
     typeDefs: typeDefs,
     resolvers: {
       Query,
+      Mutation,
     },
     context: {
       prisma,
