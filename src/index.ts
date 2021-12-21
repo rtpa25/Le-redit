@@ -12,6 +12,7 @@ import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { Context, COOKIE_NAME, __prod__ } from './types';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 
 const main = async () => {
   const RedisStore = connectRedis(session);
@@ -26,8 +27,6 @@ const main = async () => {
 
   const app = express();
 
-  app.set('trust proxy', 1);
-
   app.use(
     cors({
       credentials: true,
@@ -40,7 +39,7 @@ const main = async () => {
 
   app.use(
     session({
-      name: COOKIE_NAME,
+      name: 'geroeroerererer',
       store: new RedisStore({
         client: redisClient,
         disableTouch: true,
@@ -63,13 +62,16 @@ const main = async () => {
       Query,
       Mutation,
     },
-    context: ({ req, res }): Context => {
-      return {
-        prisma: prisma,
-        req: req,
-        res: res,
-      };
-    },
+    context: ({ req, res }): Context => ({
+      req,
+      res,
+      prisma,
+    }),
+    plugins: [
+      ApolloServerPluginLandingPageGraphQLPlayground({
+        // options
+      }),
+    ],
   });
 
   await server.start();

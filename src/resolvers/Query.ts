@@ -41,4 +41,15 @@ export const Query = {
 
     return post;
   },
+  me: async (_: any, __: any, { prisma, req }: Context) => {
+    if (!req.session.userId) {
+      return null;
+    }
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.session.userId,
+      },
+    });
+    return user;
+  },
 };

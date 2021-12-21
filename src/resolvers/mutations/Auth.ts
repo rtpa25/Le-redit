@@ -24,7 +24,7 @@ interface AuthOutput {
 
 declare module 'express-session' {
   interface Session {
-    userId: Number;
+    userId: number;
   }
 }
 
@@ -33,7 +33,7 @@ export const authResolvers = {
   register: async (
     _: any,
     { options }: AuthArgs,
-    { prisma }: Context
+    { prisma, req }: Context
   ): Promise<AuthOutput> => {
     const { username, password } = options;
     try {
@@ -83,6 +83,10 @@ export const authResolvers = {
           password: hashedPassword,
         },
       });
+      //store user id session
+      // this will set a cookie on the user from the server
+      // keep them logged in
+      req.session.userId = user.id;
       return {
         errors: null,
         user: user,
@@ -138,8 +142,11 @@ export const authResolvers = {
           user: null,
         };
       }
+
       req.session.userId = user.id;
+
       //return responce
+
       return {
         errors: null,
         user: user,
