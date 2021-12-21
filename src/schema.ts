@@ -1,6 +1,6 @@
 /** @format */
 
-import { gql } from 'apollo-server';
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
   type Query {
@@ -12,6 +12,16 @@ export const typeDefs = gql`
     postCreate(title: String!): Post
     postUpdate(id: ID!, title: String!): Post
     postDelete(id: ID!): Boolean!
+    register(options: AuthInput!): AuthOutput
+    login(options: AuthInput!): AuthOutput
+  }
+  type AuthOutput {
+    errors: [FieldError]
+    user: User
+  }
+  type FieldError {
+    field: String
+    message: String
   }
   type Post {
     id: ID!
@@ -24,5 +34,9 @@ export const typeDefs = gql`
     createdAt: String!
     updatedAt: String!
     username: String!
+  }
+  input AuthInput {
+    username: String!
+    password: String!
   }
 `;
