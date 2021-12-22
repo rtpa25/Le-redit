@@ -30,16 +30,13 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: [
-        'https://studio.apollographql.com',
-        'http://localhost:4000/graphql',
-      ],
+      origin: 'http://localhost:3000',
     })
   );
 
   app.use(
     session({
-      name: 'geroeroerererer',
+      name: COOKIE_NAME,
       store: new RedisStore({
         client: redisClient,
         disableTouch: true,

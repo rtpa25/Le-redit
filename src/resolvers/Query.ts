@@ -41,6 +41,7 @@ export const Query = {
 
     return post;
   },
+  //query to fetch the current user or null if not auth
   me: async (_: any, __: any, { prisma, req }: Context) => {
     if (!req.session.userId) {
       return null;

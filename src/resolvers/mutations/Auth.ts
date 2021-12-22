@@ -69,7 +69,7 @@ export const authResolvers = {
         return {
           errors: [
             {
-              field: 'userExistence',
+              field: 'username',
               message: 'user already exist please login',
             },
           ],
@@ -96,7 +96,7 @@ export const authResolvers = {
       return {
         errors: [
           {
-            field: 'server',
+            field: 'password',
             message: 'Either you messed up or we',
           },
         ],
@@ -156,7 +156,7 @@ export const authResolvers = {
       return {
         errors: [
           {
-            field: 'server',
+            field: 'password',
             message: 'Either you messed up or we',
           },
         ],
