@@ -1,7 +1,7 @@
 /** @format */
 
 import { User } from '@prisma/client';
-import { Context } from '../../types';
+import { Context, COOKIE_NAME } from '../../types';
 import argon2 from 'argon2';
 import logger from '../../utils/logger';
 
@@ -163,5 +163,19 @@ export const authResolvers = {
         user: null,
       };
     }
+  },
+  //MUTATION TO LOGOUT
+  logout: async (_: any, __: any, { req, res }: Context): Promise<Boolean> => {
+    return new Promise((resolve) =>
+      req.session.destroy((err) => {
+        res.clearCookie(COOKIE_NAME);
+        if (err) {
+          logger.error(err);
+          resolve(false);
+          return;
+        }
+        resolve(true);
+      })
+    );
   },
 };

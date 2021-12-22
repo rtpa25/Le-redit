@@ -15,6 +15,7 @@ export const typeDefs = gql`
     postDelete(id: ID!): Boolean!
     register(options: AuthInput!): AuthOutput
     login(options: AuthInput!): AuthOutput
+    logout: Boolean
   }
   type AuthOutput {
     errors: [FieldError]
