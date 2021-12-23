@@ -26,6 +26,9 @@ export const postResolvers = {
       throw new Error('unauthenticated user');
     }
     const { text, title } = options;
+    if (text.length <= 2 || title.length <= 2) {
+      throw new Error('Please write a valid post');
+    }
     const createdPost = await prisma.post.create({
       data: {
         title: title,
