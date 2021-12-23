@@ -10,7 +10,7 @@ export const typeDefs = gql`
     me: User
   }
   type Mutation {
-    postCreate(title: String!): Post
+    postCreate(options: PostInput!): Post
     postUpdate(id: ID!, title: String!): Post
     postDelete(id: ID!): Boolean!
     register(options: SignupAuthInput!): AuthOutput
@@ -30,8 +30,11 @@ export const typeDefs = gql`
   type Post {
     id: ID!
     title: String!
+    text: String!
     createdAt: String!
     updatedAt: String!
+    creatorId: ID!
+    points: Int!
   }
   type User {
     id: ID!
@@ -39,6 +42,7 @@ export const typeDefs = gql`
     updatedAt: String!
     username: String!
     email: String!
+    posts: [Post!]
   }
   input SignupAuthInput {
     email: String!
@@ -52,5 +56,9 @@ export const typeDefs = gql`
   input ChangePasswordInput {
     token: String!
     newPassword: String!
+  }
+  input PostInput {
+    title: String!
+    text: String!
   }
 `;

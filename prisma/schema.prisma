@@ -12,6 +12,10 @@ model Post {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   title     String
+  text      String
+  points    Int      @default(0)
+  creatorId Int      @unique
+  creator   User     @relation(fields: [creatorId], references: [id])
 }
 
 model User {
@@ -21,4 +25,5 @@ model User {
   username  String   @unique
   email     String   @unique
   password  String
+  posts     Post[]
 }
