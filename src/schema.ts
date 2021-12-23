@@ -13,9 +13,11 @@ export const typeDefs = gql`
     postCreate(title: String!): Post
     postUpdate(id: ID!, title: String!): Post
     postDelete(id: ID!): Boolean!
-    register(options: AuthInput!): AuthOutput
-    login(options: AuthInput!): AuthOutput
+    register(options: SignupAuthInput!): AuthOutput
+    login(options: SigninAuthInput!): AuthOutput
     logout: Boolean
+    forgotPassword(email: String!): Boolean!
+    changePassword(options: ChangePasswordInput!): AuthOutput
   }
   type AuthOutput {
     errors: [FieldError]
@@ -36,9 +38,19 @@ export const typeDefs = gql`
     createdAt: String!
     updatedAt: String!
     username: String!
+    email: String!
   }
-  input AuthInput {
+  input SignupAuthInput {
+    email: String!
     username: String!
     password: String!
+  }
+  input SigninAuthInput {
+    username: String!
+    password: String!
+  }
+  input ChangePasswordInput {
+    token: String!
+    newPassword: String!
   }
 `;

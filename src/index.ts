@@ -15,6 +15,7 @@ import { Context, COOKIE_NAME, __prod__ } from './types';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 
 const main = async () => {
+  // sendEmail('bob@email.com', 'hello');
   const RedisStore = connectRedis(session);
 
   const redisClient = new Redis({
@@ -63,6 +64,7 @@ const main = async () => {
       req,
       res,
       prisma,
+      redisClient,
     }),
     plugins: [
       ApolloServerPluginLandingPageGraphQLPlayground({
