@@ -23,9 +23,12 @@ model Upvote {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   userId    Int
+  value     Int
   user      User     @relation(fields: [userId], references: [id])
   postId    Int
   post      Post     @relation(fields: [postId], references: [id])
+
+  @@unique([postId, userId])
 }
 
 model User {

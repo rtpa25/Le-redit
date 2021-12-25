@@ -18,7 +18,10 @@ export const typeDefs = gql`
     logout: Boolean
     forgotPassword(email: String!): Boolean!
     changePassword(options: ChangePasswordInput!): AuthOutput
+    vote(options: VoteInput!): Boolean
+    unVote(postId: ID!): Boolean
   }
+
   type AuthOutput {
     errors: [FieldError]
     user: User
@@ -26,6 +29,13 @@ export const typeDefs = gql`
   type FieldError {
     field: String
     message: String
+  }
+  type Upvote {
+    id: ID!
+    createdAt: String!
+    userId: ID!
+    value: Int!
+    postId: ID!
   }
   type Post {
     id: ID!
@@ -36,7 +46,8 @@ export const typeDefs = gql`
     updatedAt: String!
     creatorId: ID!
     creator: User!
-    points: Int!
+    upvote: [Upvote!]
+    points: Int
   }
   type PaginatedPosts {
     posts: [Post]
@@ -66,5 +77,9 @@ export const typeDefs = gql`
   input PostInput {
     title: String!
     text: String!
+  }
+  input VoteInput {
+    postId: ID!
+    value: Int!
   }
 `;
