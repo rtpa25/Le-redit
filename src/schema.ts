@@ -5,7 +5,7 @@ import { gql } from 'apollo-server-express';
 export const typeDefs = gql`
   type Query {
     hello: String!
-    posts: [Post]
+    posts(limit: Int!, cursor: Int): PaginatedPosts
     post(id: ID!): Post
     me: User
   }
@@ -31,10 +31,16 @@ export const typeDefs = gql`
     id: ID!
     title: String!
     text: String!
+    textSnippet: String!
     createdAt: String!
     updatedAt: String!
     creatorId: ID!
+    creator: User!
     points: Int!
+  }
+  type PaginatedPosts {
+    posts: [Post]
+    hasMorePosts: Boolean!
   }
   type User {
     id: ID!

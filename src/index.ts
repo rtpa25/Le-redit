@@ -5,7 +5,7 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import logger from './utils/logger';
 import { typeDefs } from './schema';
-import { Mutation, Query } from './resolvers/z(exporter)';
+import { Mutation, Post, Query, User } from './resolvers/z(exporter)';
 import express from 'express';
 import cors from 'cors';
 import Redis from 'ioredis';
@@ -59,6 +59,8 @@ const main = async () => {
     resolvers: {
       Query,
       Mutation,
+      Post,
+      User,
     },
     context: ({ req, res }): Context => ({
       req,

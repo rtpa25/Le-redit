@@ -7,25 +7,56 @@ interface PostFetchParamType {
   id: string;
 }
 
+interface PaginatedPosts {
+  posts: Post[];
+  hasMorePosts: boolean;
+}
+
 export const Query = {
   //Query to test connection
   hello: () => {
     return 'Hello World';
   },
+
   //query to fetch all posts
   posts: async (
     _: any,
-    __: any,
+    { limit, cursor }: { limit: number; cursor: number },
     { prisma }: Context
-  ): Promise<Post[] | null> => {
-    const posts = await prisma.post.findMany({
-      orderBy: [
-        {
-          createdAt: 'desc',
+  ): Promise<PaginatedPosts> => {
+    const reallimit = Math.min(50, limit);
+    const realLimitPlusOne = reallimit + 1;
+    let posts;
+
+    if (cursor) {
+      posts = await prisma.post.findMany({
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+        ],
+        take: realLimitPlusOne,
+        skip: 1,
+        cursor: {
+          id: cursor,
         },
-      ],
-    });
-    return posts;
+      });
+    } else {
+      posts = await prisma.post.findMany({
+        orderBy: [
+          {
+            createdAt: 'desc',
+          },
+        ],
+        take: realLimitPlusOne,
+      });
+    }
+    const obj = {
+      posts: posts.slice(0, reallimit),
+      hasMorePosts: posts.length === realLimitPlusOne,
+    };
+
+    return obj;
   },
   //query to fetch a single post
   post: async (

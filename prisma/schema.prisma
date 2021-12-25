@@ -16,6 +16,16 @@ model Post {
   points    Int      @default(0)
   creatorId Int
   creator   User     @relation(fields: [creatorId], references: [id])
+  upvotes   Upvote[]
+}
+
+model Upvote {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model User {
@@ -26,4 +36,5 @@ model User {
   email     String   @unique
   password  String
   posts     Post[]
+  upvotes   Upvote[]
 }
