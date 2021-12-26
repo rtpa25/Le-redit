@@ -1,6 +1,5 @@
 /** @format */
 
-import { Upvote } from '@prisma/client';
 import { Context } from '../types';
 
 interface PostParentType {

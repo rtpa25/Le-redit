@@ -2,10 +2,12 @@
 
 import { Post } from '@prisma/client';
 import { Context } from '../../types';
+import logger from '../../utils/logger';
 
 interface PostArgs {
   title: string;
   id: string;
+  text: string;
 }
 
 interface PostCreateInputArgs {
@@ -41,30 +43,37 @@ export const postResolvers = {
   //MUTATION TO UPDATE POST
   postUpdate: async (
     _: any,
-    { id, title }: PostArgs,
+    { id, title, text }: PostArgs,
     { prisma, req }: Context
   ): Promise<Post | null> => {
-    if (!req.session.userId) {
+    const { userId } = req.session;
+    if (!userId) {
       throw new Error('unauthenticated user');
+    }
+    if (title === undefined && text === undefined) {
+      return null;
     }
     const post = await prisma.post.findUnique({
       where: {
         id: Number(id),
       },
     });
+
+    if (post?.creatorId !== userId) {
+      return null;
+    }
+
     if (!post) {
       return null;
     }
-    if (title !== undefined) {
-      const updatedPost = await prisma.post.update({
-        where: {
-          id: Number(id),
-        },
-        data: { title: title },
-      });
-      return updatedPost;
-    }
-    return null;
+
+    const updatedPost = await prisma.post.update({
+      where: {
+        id: Number(id),
+      },
+      data: { title: title, text: text },
+    });
+    return updatedPost;
   },
   //MUTATION TO DELETE POST
   postDelete: async (
@@ -72,12 +81,25 @@ export const postResolvers = {
     { id }: PostArgs,
     { prisma, req }: Context
   ): Promise<boolean> => {
-    if (!req.session.userId) {
-      throw new Error('unauthenticated user');
+    try {
+      const { userId } = req.session;
+      if (!userId) {
+        throw new Error('unauthenticated user');
+      }
+      const post = await prisma.post.findUnique({
+        where: { id: Number(id) },
+      });
+      if (post?.creatorId !== userId) {
+        return false;
+      }
+
+      await prisma.post.delete({
+        where: { id: Number(id) },
+      });
+      return true;
+    } catch (error: any) {
+      logger.error(error.message);
+      return false;
     }
-    await prisma.post.delete({
-      where: { id: Number(id) },
-    });
-    return true;
   },
 };
