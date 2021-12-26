@@ -11,7 +11,7 @@ export const typeDefs = gql`
   }
   type Mutation {
     postCreate(options: PostInput!): Post
-    postUpdate(id: ID!, title: String!): Post
+    postUpdate(id: ID!, title: String, text: String): Post
     postDelete(id: ID!): Boolean!
     register(options: SignupAuthInput!): AuthOutput
     login(options: SigninAuthInput!): AuthOutput
