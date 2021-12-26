@@ -1,6 +1,5 @@
 /** @format */
 
-import { Prisma } from '@prisma/client';
 import { Context } from '../../types';
 import logger from '../../utils/logger';
 
@@ -24,15 +23,42 @@ export const VoteResolvers = {
       if (!userId) {
         throw new Error('unauthenticated user');
       }
-      console.log(postId, userId, value);
 
-      await prisma.upvote.create({
-        data: {
-          userId: userId,
+      const upvotes = await prisma.upvote.findMany({
+        where: {
           postId: parseInt(postId),
-          value: value,
+          userId: userId,
         },
       });
+      console.log(upvotes);
+      //user has never voted on this post
+      if (upvotes.length === 0) {
+        const vote = await prisma.upvote.create({
+          data: {
+            userId: userId,
+            postId: parseInt(postId),
+            value: value,
+          },
+        });
+        console.log(vote);
+      } //user has voted before on this post
+      else {
+        const voteValue = upvotes[0].value;
+        if (voteValue !== value) {
+          await prisma.upvote.updateMany({
+            where: {
+              postId: parseInt(postId),
+              userId: userId,
+            },
+            data: {
+              value: value,
+            },
+          });
+        } else if (voteValue === value) {
+          return false;
+        }
+      }
+
       return true;
     } catch (error: any) {
       logger.error(error.message);
@@ -42,7 +68,7 @@ export const VoteResolvers = {
   //MUTATION TO UNVOTE FOR A POST
   unVote: async (
     _: any,
-    postId: number,
+    { postId }: any,
     { prisma, req }: Context
   ): Promise<boolean> => {
     try {
@@ -51,12 +77,12 @@ export const VoteResolvers = {
         throw new Error('unauthenticated user');
       }
 
-      await prisma.$queryRaw(
-        Prisma.sql`
-          DELETE FROM "Upvote"
-          WHERE "postId"=${postId} AND "userId"=${userId}
-        `
-      );
+      await prisma.upvote.deleteMany({
+        where: {
+          userId: userId,
+          postId: parseInt(postId),
+        },
+      });
 
       return true;
     } catch (error: any) {

@@ -1,5 +1,6 @@
 /** @format */
 
+import { Upvote } from '@prisma/client';
 import { Context } from '../types';
 
 interface PostParentType {
@@ -47,5 +48,31 @@ export const Post = {
       }
     });
     return points;
+  },
+  voteStatus: async (
+    parent: PostParentType,
+    _: any,
+    { prisma, req }: Context
+  ): Promise<-1 | 1 | null> => {
+    const { id: postID } = parent;
+    const { userId } = req.session;
+    if (!userId) {
+      throw new Error('unauthenticated user');
+    }
+    const upvotes = await prisma.upvote.findMany({
+      where: {
+        userId: userId,
+        postId: postID,
+      },
+    });
+    if (upvotes.length !== 0) {
+      if (upvotes[0].value === 1) {
+        return 1;
+      } else {
+        return -1;
+      }
+    } else {
+      return null;
+    }
   },
 };

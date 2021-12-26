@@ -48,6 +48,7 @@ export const typeDefs = gql`
     creator: User!
     upvote: [Upvote!]
     points: Int
+    voteStatus: Int
   }
   type PaginatedPosts {
     posts: [Post]
