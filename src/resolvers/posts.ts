@@ -12,11 +12,7 @@ export const Post = {
   textSnippet(parent: PostParentType) {
     return parent.text.slice(0, 50);
   },
-  creator: async (
-    parent: PostParentType,
-    _: any,
-    { prisma, userLoader }: Context
-  ) => {
+  creator: async (parent: PostParentType, _: any, { userLoader }: Context) => {
     const { creatorId } = parent;
     const creator = await userLoader.load(creatorId); //batches all into a single call so really fast
     console.log(creator);
@@ -52,21 +48,20 @@ export const Post = {
   voteStatus: async (
     parent: PostParentType,
     _: any,
-    { prisma, req }: Context
+    { req, upvoteLoader }: Context
   ): Promise<-1 | 1 | null> => {
     const { id: postID } = parent;
     const { userId } = req.session;
     if (!userId) {
-      throw new Error('unauthenticated user');
+      return null;
     }
-    const upvotes = await prisma.upvote.findMany({
-      where: {
-        userId: userId,
-        postId: postID,
-      },
+    const upvote = await upvoteLoader.load({
+      userId: userId,
+      postId: postID,
     });
-    if (upvotes.length !== 0) {
-      if (upvotes[0].value === 1) {
+
+    if (upvote) {
+      if (upvote.value === 1) {
         return 1;
       } else {
         return -1;

@@ -1,9 +1,10 @@
 /** @format */
 
-import { Prisma, PrismaClient, User } from '@prisma/client';
-import DataLoader from 'dataloader';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import { Redis } from 'ioredis';
+import { createUpvoteLoader } from './utils/createUpvoteLoader';
+import { createUserLoader } from './utils/createUserLoader';
 
 export interface Context {
   prisma: PrismaClient<
@@ -14,7 +15,8 @@ export interface Context {
   req: Request;
   res: Response;
   redisClient: Redis;
-  userLoader: DataLoader<number, User>;
+  userLoader: ReturnType<typeof createUserLoader>;
+  upvoteLoader: ReturnType<typeof createUpvoteLoader>;
 }
 
 export const __prod__ = process.env.NODE_ENV === 'production';

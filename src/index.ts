@@ -14,6 +14,7 @@ import connectRedis from 'connect-redis';
 import { Context, COOKIE_NAME, __prod__ } from './types';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { createUserLoader } from './utils/createUserLoader';
+import { createUpvoteLoader } from './utils/createUpvoteLoader';
 
 const main = async () => {
   // sendEmail('bob@email.com', 'hello');
@@ -69,6 +70,7 @@ const main = async () => {
       prisma,
       redisClient,
       userLoader: createUserLoader(),
+      upvoteLoader: createUpvoteLoader(),
     }),
     plugins: [
       ApolloServerPluginLandingPageGraphQLPlayground({
