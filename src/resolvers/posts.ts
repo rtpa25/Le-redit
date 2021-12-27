@@ -12,13 +12,14 @@ export const Post = {
   textSnippet(parent: PostParentType) {
     return parent.text.slice(0, 50);
   },
-  creator: async (parent: PostParentType, _: any, { prisma }: Context) => {
+  creator: async (
+    parent: PostParentType,
+    _: any,
+    { prisma, userLoader }: Context
+  ) => {
     const { creatorId } = parent;
-    const creator = await prisma.user.findUnique({
-      where: {
-        id: creatorId,
-      },
-    });
+    const creator = await userLoader.load(creatorId); //batches all into a single call so really fast
+    console.log(creator);
 
     return creator;
   },
