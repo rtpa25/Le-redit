@@ -27,7 +27,7 @@ const main = async () => {
   });
 
   const app = express();
-  app.set('proxy', 1);
+  app.set('trust proxy', 1);
   app.use(
     cors({
       credentials: true,
@@ -44,9 +44,9 @@ const main = async () => {
       }),
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-        httpOnly: true, //disable access of cookie in frontend
-        secure: __prod__, //prod is true in production https server
-        sameSite: 'lax', // csrf //TODO: PLEASE GOOGLE THIS
+        // httpOnly: true, //disable access of cookie in frontend
+        // secure: __prod__, //prod is true in production https server
+        // sameSite: 'lax', // csrf //TODO: PLEASE GOOGLE THIS
         domain: 'http://localhost:3000',
       },
       saveUninitialized: false,
