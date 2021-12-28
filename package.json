@@ -10,7 +10,7 @@
   },
   "keywords": [],
   "author": "Ronit Panda",
-  "license": "MIT",
+  "license": "ISC",
   "dependencies": {
     "@prisma/client": "^3.7.0",
     "@types/connect-redis": "^0.0.18",
