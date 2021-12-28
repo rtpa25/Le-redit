@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "start": "node dist/index.js",
-    "build": "tsc"
+    "postinstall": "tsc"
   },
   "keywords": [],
   "author": "Ronit Panda",
