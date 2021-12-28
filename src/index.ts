@@ -43,11 +43,10 @@ const main = async () => {
         disableTouch: true,
       }),
       cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-        httpOnly: true, //disable access of cookie in frontend
-        secure: __prod__, //prod is true in production https server
-        sameSite: 'lax', // csrf //TODO: PLEASE GOOGLE THIS
-        domain: __prod__ && 'le-redit-web.vercel.app',
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
+        httpOnly: true,
+        secure: __prod__,
+        sameSite: 'lax',
       },
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET as string,
