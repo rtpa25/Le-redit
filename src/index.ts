@@ -31,7 +31,7 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: ['http://localhost:3000', 'https://le-redit-web.vercel.app'],
+      origin: ['http://localhost:3000', 'https://www.etherapp.social/'],
     })
   );
 
@@ -47,6 +47,7 @@ const main = async () => {
         httpOnly: true,
         secure: __prod__,
         sameSite: 'lax',
+        domain: __prod__ && 'etherapp.social',
       },
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET as string,
