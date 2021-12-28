@@ -36,7 +36,7 @@ export const Post = {
       },
     });
     let points = 0;
-    upvotes.forEach((upvote) => {
+    upvotes.forEach((upvote: { value: number }) => {
       if (upvote.value === 1) {
         points++;
       } else {

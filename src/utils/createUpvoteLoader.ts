@@ -30,7 +30,7 @@ export const createUpvoteLoader = () =>
       });
 
       const upvoteIdsToUpvote: Record<string, Upvote> = {};
-      upvotes.forEach((upvote) => {
+      upvotes.forEach((upvote: Upvote) => {
         upvoteIdsToUpvote[`${upvote.userId} | ${upvote.postId}`] = upvote;
       });
 

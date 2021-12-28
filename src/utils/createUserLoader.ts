@@ -16,7 +16,7 @@ export const createUserLoader = () =>
     });
 
     const userIdToUser: Record<number, User> = {};
-    users.forEach((user) => {
+    users.forEach((user: User) => {
       userIdToUser[user.id] = user;
     });
 

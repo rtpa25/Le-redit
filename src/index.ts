@@ -1,7 +1,7 @@
 /** @format */
 
 import { ApolloServer } from 'apollo-server-express';
-import 'dotenv/config';
+import 'dotenv-safe/config';
 import { PrismaClient } from '@prisma/client';
 import logger from './utils/logger';
 import { typeDefs } from './schema';
@@ -16,8 +16,8 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-co
 import { createUserLoader } from './utils/createUserLoader';
 import { createUpvoteLoader } from './utils/createUpvoteLoader';
 
+export const prisma = new PrismaClient();
 const main = async () => {
-  // sendEmail('bob@email.com', 'hello');
   const RedisStore = connectRedis(session);
 
   const redisClient = new Redis({
@@ -26,10 +26,8 @@ const main = async () => {
     password: process.env.PASSWORD as string,
   });
 
-  const prisma = new PrismaClient();
-
   const app = express();
-
+  app.set('proxy', 1);
   app.use(
     cors({
       credentials: true,
@@ -49,6 +47,7 @@ const main = async () => {
         httpOnly: true, //disable access of cookie in frontend
         secure: __prod__, //prod is true in production https server
         sameSite: 'lax', // csrf //TODO: PLEASE GOOGLE THIS
+        // domain: __prod__ && '
       },
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET as string,
