@@ -31,7 +31,7 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: 'http://localhost:3000',
+      origin: ['http://localhost:3000', 'https://le-redit-web.vercel.app'],
     })
   );
 
@@ -44,10 +44,10 @@ const main = async () => {
       }),
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-        // httpOnly: true, //disable access of cookie in frontend
-        // secure: __prod__, //prod is true in production https server
-        // sameSite: 'lax', // csrf //TODO: PLEASE GOOGLE THIS
-        domain: 'http://localhost:3000',
+        httpOnly: true, //disable access of cookie in frontend
+        secure: __prod__, //prod is true in production https server
+        sameSite: 'lax', // csrf //TODO: PLEASE GOOGLE THIS
+        domain: __prod__ && 'https://le-redit-web.vercel.app',
       },
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET as string,
