@@ -8,6 +8,9 @@
     "start": "node build/index.js",
     "postinstall": "tsc"
   },
+  "engines": {
+    "node": "16.13.1"
+  },
   "keywords": [],
   "author": "Ronit Panda",
   "license": "ISC",
