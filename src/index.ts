@@ -47,7 +47,7 @@ const main = async () => {
         httpOnly: true,
         secure: __prod__,
         sameSite: 'lax',
-        domain: __prod__ && 'etherapp.social',
+        domain: __prod__ && '.etherapp.social',
       },
       saveUninitialized: false,
       secret: process.env.SESSION_SECRET as string,
