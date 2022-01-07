@@ -117,8 +117,8 @@ export const authResolvers = {
         },
       });
       //store user id session
-      // this will set a cookie on the user from the server
-      // keep them logged in
+      //this will set a cookie on the user from the server
+      //keep them logged in
       req.session.userId = user.id;
       return {
         errors: null,

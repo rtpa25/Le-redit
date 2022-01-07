@@ -26,7 +26,7 @@ export const Query = {
   ): Promise<PaginatedPosts> => {
     const reallimit = Math.min(50, limit);
     const realLimitPlusOne = reallimit + 1;
-    let posts;
+    let posts: string | any[];
 
     if (cursor) {
       posts = await prisma.post.findMany({
@@ -74,12 +74,13 @@ export const Query = {
   },
   //query to fetch the current user or null if not auth
   me: async (_: any, __: any, { prisma, req }: Context) => {
-    if (!req.session.userId) {
+    if (req.session === undefined) {
       return null;
     }
+    const superTokenId = req.session.getUserId();
     const user = await prisma.user.findUnique({
       where: {
-        id: req.session.userId,
+        superTokenId: superTokenId,
       },
     });
     return user;

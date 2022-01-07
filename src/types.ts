@@ -1,8 +1,8 @@
 /** @format */
 
 import { Prisma, PrismaClient } from '@prisma/client';
-import { Request, Response } from 'express';
-import { Redis } from 'ioredis';
+import { Response } from 'express';
+import { SessionRequest } from 'supertokens-node/framework/express';
 import { createUpvoteLoader } from './utils/createUpvoteLoader';
 import { createUserLoader } from './utils/createUserLoader';
 
@@ -12,9 +12,8 @@ export interface Context {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
-  req: Request;
+  req: SessionRequest;
   res: Response;
-  redisClient: Redis;
   userLoader: ReturnType<typeof createUserLoader>;
   upvoteLoader: ReturnType<typeof createUpvoteLoader>;
 }
