@@ -24,21 +24,35 @@ export const postResolvers = {
     { options }: PostCreateInputArgs,
     { prisma, req }: Context
   ): Promise<Post | null> => {
-    if (!req.session.userId) {
-      throw new Error('unauthenticated user');
+    try {
+      if (req.session === undefined) {
+        throw new Error('unauthenticated user');
+      }
+      const { text, title } = options;
+      if (text.length <= 2 || title.length <= 2) {
+        throw new Error('Please write a valid post');
+      }
+
+      const supertokenId = req.session.getUserId();
+
+      const user = await prisma.user.findUnique({
+        where: {
+          superTokenId: supertokenId,
+        },
+      });
+
+      const createdPost = await prisma.post.create({
+        data: {
+          title: title,
+          text: text,
+          creatorId: user.id,
+        },
+      });
+      return createdPost;
+    } catch (error: any) {
+      logger.error(error.message);
+      return null;
     }
-    const { text, title } = options;
-    if (text.length <= 2 || title.length <= 2) {
-      throw new Error('Please write a valid post');
-    }
-    const createdPost = await prisma.post.create({
-      data: {
-        title: title,
-        text: text,
-        creatorId: req.session.userId,
-      },
-    });
-    return createdPost;
   },
   //MUTATION TO UPDATE POST
   postUpdate: async (
@@ -46,8 +60,7 @@ export const postResolvers = {
     { id, title, text }: PostArgs,
     { prisma, req }: Context
   ): Promise<Post | null> => {
-    const { userId } = req.session;
-    if (!userId) {
+    if (req.session === undefined) {
       throw new Error('unauthenticated user');
     }
     if (title === undefined && text === undefined) {
@@ -59,11 +72,17 @@ export const postResolvers = {
       },
     });
 
-    if (post?.creatorId !== userId) {
+    const user = await prisma.user.findUnique({
+      where: {
+        superTokenId: req.session.getUserId(),
+      },
+    });
+
+    if (!post || !user) {
       return null;
     }
 
-    if (!post) {
+    if (post?.creatorId !== user.id) {
       return null;
     }
 
@@ -80,17 +99,30 @@ export const postResolvers = {
     _: any,
     { id }: PostArgs,
     { prisma, req }: Context
-  ): Promise<boolean> => {
+  ): Promise<boolean | null> => {
     try {
-      const { userId } = req.session;
-      if (!userId) {
+      if (req.session === undefined) {
         throw new Error('unauthenticated user');
       }
+
       const post = await prisma.post.findUnique({
-        where: { id: Number(id) },
+        where: {
+          id: Number(id),
+        },
       });
-      if (post?.creatorId !== userId) {
-        return false;
+
+      const user = await prisma.user.findUnique({
+        where: {
+          superTokenId: req.session.getUserId(),
+        },
+      });
+
+      if (!post || !user) {
+        return null;
+      }
+
+      if (post?.creatorId !== user.id) {
+        return null;
       }
 
       await prisma.post.delete({

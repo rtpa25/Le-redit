@@ -1,59 +1,97 @@
 /** @format */
 
-import { ApolloServer } from 'apollo-server-express';
-import 'dotenv-safe/config';
 import { PrismaClient } from '@prisma/client';
-import logger from './utils/logger';
-import { typeDefs } from './schema';
-import { Mutation, Post, Query, User } from './resolvers/z(exporter)';
-import express from 'express';
-import cors from 'cors';
-import Redis from 'ioredis';
-import session from 'express-session';
-import connectRedis from 'connect-redis';
-import { Context, COOKIE_NAME, __prod__ } from './types';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { createUserLoader } from './utils/createUserLoader';
+import { ApolloServer } from 'apollo-server-express';
+import cors from 'cors';
+import 'dotenv-safe/config';
+import express from 'express';
+import supertokens from 'supertokens-node';
+import {
+  errorHandler,
+  middleware,
+  SessionRequest,
+} from 'supertokens-node/framework/express';
+import EmailPassword from 'supertokens-node/recipe/emailpassword';
+import Session from 'supertokens-node/recipe/session';
+import { Mutation, Post, Query, User } from './resolvers/z(exporter)';
+import { typeDefs } from './schema';
+import { Context } from './types';
 import { createUpvoteLoader } from './utils/createUpvoteLoader';
+import { createUserLoader } from './utils/createUserLoader';
+import logger from './utils/logger';
+import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 
 export const prisma = new PrismaClient();
 const main = async () => {
-  const RedisStore = connectRedis(session);
+  const app = express();
 
-  const redisClient = new Redis({
-    port: parseInt(process.env.REDIS_PORT as string),
-    host: process.env.REDIS_HOST as string,
-    password: process.env.PASSWORD as string,
+  supertokens.init({
+    framework: 'express',
+    supertokens: {
+      connectionURI: process.env.CONNECTION_URI,
+      apiKey: process.env.API_KEY_SUPERTOKEN,
+    },
+    appInfo: {
+      appName: 'ether',
+      apiDomain: 'http://localhost:4000',
+      websiteDomain: 'http://localhost:3000',
+    },
+    recipeList: [
+      EmailPassword.init({
+        signUpFeature: {
+          formFields: [
+            {
+              id: 'username',
+            },
+          ],
+        },
+        override: {
+          apis: (originalImplementation) => {
+            return {
+              ...originalImplementation,
+              signUpPOST: async function (input) {
+                if (originalImplementation.signUpPOST === undefined) {
+                  throw Error('Should never come here');
+                }
+                // First we call the original implementation of signUpPOST.
+                const response = await originalImplementation.signUpPOST(input);
+
+                // Post sign up response, we check if it was successful
+                if (response.status === 'OK') {
+                  const { id, email } = response.user;
+                  const formFields = input.formFields;
+                  await prisma.user.create({
+                    data: {
+                      username: formFields[2].value,
+                      email: email,
+                      superTokenId: id,
+                    },
+                  });
+                }
+                return response;
+              },
+            };
+          },
+        },
+      }), // initializes signin / sign up features
+      Session.init(), // initializes session features
+    ],
   });
 
-  const app = express();
-  app.set('trust proxy', 1);
+  // app.set('trust proxy', 1);
+
   app.use(
     cors({
+      origin: ['http://localhost:3000'],
+      allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
       credentials: true,
-      origin: ['http://localhost:3000', 'https://www.etherapp.social'],
     })
   );
 
-  app.use(
-    session({
-      name: COOKIE_NAME,
-      store: new RedisStore({
-        client: redisClient,
-        disableTouch: true,
-      }),
-      cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
-        httpOnly: true,
-        secure: __prod__,
-        sameSite: 'lax',
-        domain: __prod__ && '.etherapp.social',
-      },
-      saveUninitialized: false,
-      secret: process.env.SESSION_SECRET as string,
-      resave: false, //to avoid continuous ping to redis
-    })
-  );
+  app.use(middleware());
+
+  app.use('/graphql', verifySession({ sessionRequired: false }) as any);
 
   const server = new ApolloServer({
     typeDefs: typeDefs,
@@ -63,14 +101,15 @@ const main = async () => {
       Post,
       User,
     },
-    context: ({ req, res }): Context => ({
-      req,
-      res,
-      prisma,
-      redisClient,
-      userLoader: createUserLoader(),
-      upvoteLoader: createUpvoteLoader(),
-    }),
+    context: ({ req, res }, verifySession): Context => {
+      return {
+        req,
+        res,
+        prisma,
+        userLoader: createUserLoader(),
+        upvoteLoader: createUpvoteLoader(),
+      };
+    },
     plugins: [
       ApolloServerPluginLandingPageGraphQLPlayground({
         // options
@@ -85,11 +124,13 @@ const main = async () => {
     cors: false,
   });
 
+  app.use(errorHandler());
+
   app.listen(process.env.PORT, () => {
     logger.info(`gql path is http://localhost:4000${server.graphqlPath}`);
   });
 };
 
-main().catch((e: any) => {
+main().catch((e: Error) => {
   logger.error(e.message);
 });

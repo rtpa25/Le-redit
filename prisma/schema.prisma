@@ -32,12 +32,12 @@ model Upvote {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  username  String   @unique
-  email     String   @unique
-  password  String
-  posts     Post[]
-  upvotes   Upvote[]
+  id           Int      @id @default(autoincrement())
+  superTokenId String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  username     String   @unique
+  email        String   @unique
+  posts        Post[]
+  upvotes      Upvote[]
 }

@@ -19,10 +19,17 @@ export const VoteResolvers = {
   ): Promise<boolean> => {
     const { postId, value } = options;
     try {
-      const { userId } = req.session;
-      if (!userId) {
+      if (!req.session) {
         throw new Error('unauthenticated user');
       }
+
+      const superTokenId = req.session.getUserId();
+      const user = await prisma.user.findUnique({
+        where: {
+          superTokenId: superTokenId,
+        },
+      });
+      const userId = user.id;
 
       const upvotes = await prisma.upvote.findMany({
         where: {
@@ -30,7 +37,6 @@ export const VoteResolvers = {
           userId: userId,
         },
       });
-      console.log(upvotes);
       //user has never voted on this post
       if (upvotes.length === 0) {
         const vote = await prisma.upvote.create({
@@ -72,15 +78,24 @@ export const VoteResolvers = {
     { prisma, req }: Context
   ): Promise<boolean> => {
     try {
-      const { userId } = req.session;
-      if (!userId) {
+      if (!req.session) {
         throw new Error('unauthenticated user');
       }
 
-      await prisma.upvote.deleteMany({
+      const superTokenId = req.session.getUserId();
+      const user = await prisma.user.findUnique({
         where: {
-          userId: userId,
-          postId: parseInt(postId),
+          superTokenId: superTokenId,
+        },
+      });
+      const userId = user.id;
+
+      await prisma.upvote.delete({
+        where: {
+          postId_userId: {
+            postId: postId,
+            userId: userId,
+          },
         },
       });
 

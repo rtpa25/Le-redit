@@ -15,8 +15,6 @@ export const Post = {
   creator: async (parent: PostParentType, _: any, { userLoader }: Context) => {
     const { creatorId } = parent;
     const creator = await userLoader.load(creatorId); //batches all into a single call so really fast
-    console.log(creator);
-
     return creator;
   },
   upvote: async (parent: PostParentType, _: any, { prisma }: Context) => {
@@ -48,10 +46,23 @@ export const Post = {
   voteStatus: async (
     parent: PostParentType,
     _: any,
-    { req, upvoteLoader }: Context
+    { req, upvoteLoader, prisma }: Context
   ): Promise<-1 | 1 | null> => {
     const { id: postID } = parent;
-    const { userId } = req.session;
+
+    //unauth user
+    if (!req.session) {
+      return null;
+    }
+
+    const superTokenId = req.session.getUserId();
+    const user = await prisma.user.findUnique({
+      where: {
+        superTokenId: superTokenId,
+      },
+    });
+    const userId = user.id;
+
     if (!userId) {
       return null;
     }
