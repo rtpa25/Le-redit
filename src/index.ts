@@ -7,20 +7,16 @@ import cors from 'cors';
 import 'dotenv-safe/config';
 import express from 'express';
 import supertokens from 'supertokens-node';
-import {
-  errorHandler,
-  middleware,
-  SessionRequest,
-} from 'supertokens-node/framework/express';
+import { errorHandler, middleware } from 'supertokens-node/framework/express';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import Session from 'supertokens-node/recipe/session';
+import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { Mutation, Post, Query, User } from './resolvers/z(exporter)';
 import { typeDefs } from './schema';
 import { Context } from './types';
 import { createUpvoteLoader } from './utils/createUpvoteLoader';
 import { createUserLoader } from './utils/createUserLoader';
 import logger from './utils/logger';
-import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 
 export const prisma = new PrismaClient();
 const main = async () => {

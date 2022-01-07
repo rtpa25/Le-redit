@@ -93,7 +93,7 @@ export const VoteResolvers = {
       await prisma.upvote.delete({
         where: {
           postId_userId: {
-            postId: postId,
+            postId: parseInt(postId),
             userId: userId,
           },
         },

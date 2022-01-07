@@ -1,12 +1,10 @@
 /** @format */
 
 import { Prisma, PrismaClient } from '@prisma/client';
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { SessionRequest } from 'supertokens-node/framework/express';
 import { createUpvoteLoader } from './utils/createUpvoteLoader';
 import { createUserLoader } from './utils/createUserLoader';
-
-import { SessionRequest } from 'supertokens-node/framework/express';
-import { verifySession } from 'supertokens-node/lib/build/recipe/session/framework/express';
 
 export interface Context {
   prisma: PrismaClient<
