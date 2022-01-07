@@ -13,12 +13,13 @@ import Session from 'supertokens-node/recipe/session';
 import { verifySession } from 'supertokens-node/recipe/session/framework/express';
 import { Mutation, Post, Query, User } from './resolvers/z(exporter)';
 import { typeDefs } from './schema';
-import { Context } from './types';
+import { Context, __prod__ } from './types';
 import { createUpvoteLoader } from './utils/createUpvoteLoader';
 import { createUserLoader } from './utils/createUserLoader';
 import logger from './utils/logger';
 
 export const prisma = new PrismaClient();
+
 const main = async () => {
   const app = express();
 
@@ -30,8 +31,12 @@ const main = async () => {
     },
     appInfo: {
       appName: 'ether',
-      apiDomain: 'http://localhost:4000',
-      websiteDomain: 'http://localhost:3000',
+      apiDomain: __prod__
+        ? 'https://api.etherapp.social'
+        : 'http://localhost:4000',
+      websiteDomain: __prod__
+        ? 'https://www.etherapp.social'
+        : 'http://localhost:3000',
     },
     recipeList: [
       EmailPassword.init({
@@ -77,7 +82,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: ['http://localhost:3000'],
+      origin: ['http://localhost:3000', 'https://www.etherapp.social'],
       allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
       credentials: true,
     })
